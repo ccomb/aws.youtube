@@ -6,7 +6,11 @@ class IYoutubeable(IAttributeAnnotatable):
     typically video blob (or non blob) objects
     """
 
-class IYoutube(Interface):
+class IYoutubeAnnotations(Interface):
     """Interface of the annotation adapter
+    """
+
+class IYoutube(Interface):
+    """Interface of the Youtube features
     """
 

@@ -35,9 +35,11 @@ Youtube interface and adapter
 
 The Youtube interface exposes the available features added to a video file:
 
->>> from aws.youtube.interfaces import IYoutube
+>>> from aws.youtube.interfaces import IYoutube, IYoutubeAnnotations
 >>> IYoutube
 <InterfaceClass aws.youtube.interfaces.IYoutube>
+>>> IYoutubeAnnotations
+<InterfaceClass aws.youtube.interfaces.IYoutubeAnnotations>
 
 To be able to retrieve an adapter or a youtube view, we have a marker interface
 to tag any object with youtube capability:
@@ -61,12 +63,13 @@ We create an instance:
 
 >>> mysample = Sample()
 
-Now we have a IYoutube adapter on this object:
-(we first register it)
+Now we have a IYoutube adapter and an annotations adapter on this object:
+(we first register them)
 
->>> from aws.youtube.adapters import youtubefactory
+>>> from aws.youtube.adapters import youtubeannotations, Youtube
 >>> from zope.component import getGlobalSiteManager
->>> getGlobalSiteManager().registerAdapter(youtubefactory)
+>>> getGlobalSiteManager().registerAdapter(youtubeannotations)
+>>> getGlobalSiteManager().registerAdapter(Youtube)
 
 We also have to register the standard annotations adapter
 (normally done in ZCML)
@@ -76,14 +79,14 @@ We also have to register the standard annotations adapter
 
 Now we can retrieve our adapter:
 
->>> IYoutube(mysample)
-<aws.youtube.adapters.Youtube object at ...>
+>>> IYoutubeAnnotations(mysample)
+<aws.youtube.adapters.YoutubeAnnotations object at ...>
 
 The adapter is an annotation adapter that stores additional data:
 
->>> IYoutube(mysample).foobar = 'baz'
+>>> IYoutubeAnnotations(mysample).foobar = 'baz'
 >>> print list(mysample.__annotations__.items())
-[('aws.youtube.adapters.Youtube', <aws.youtube.adapters.Youtube object at
+[('aws.youtube.adapters.YoutubeAnnotations', <aws.youtube.adapters.YoutubeAnnotations object at
 ...>)]
 
 We can ask for a authentication link
@@ -96,7 +99,7 @@ Then we can authenticate with a single-use token provided by google:
 
 This will store the token so that we can use it in later requests:
 
->>> token = IYoutube(mysample).token
+>>> token = IYoutubeAnnotations(mysample).auth_token
 >>> token
 xXxXx
 
@@ -124,7 +127,7 @@ We call the content provider:
 If we use our stored session token, the content provider displays the upload
 button:
 
->>> IYoutube(mysample).auth_token = token
+>>> IYoutubeAnnotations(mysample).auth_token = token
 >>> uploadview.update()
 >>> print uploadview.render()
     <div id="aws.youtube.upload">
@@ -133,7 +136,7 @@ button:
 
 While the video is being uploaded, the content provider displays a status:
 
->>> IYoutube(mysample).auth_token = token
+>>> IYoutubeAnnotations(mysample).auth_token = token
 >>> uploadview.update()
 >>> print uploadview.render()
     <div id="aws.youtube.upload">
@@ -143,7 +146,7 @@ While the video is being uploaded, the content provider displays a status:
 Once it is uploaded, it displays the link to the youtube video, and a link to
 delete it.
 
->>> IYoutube(mysample).auth_token = token
+>>> IYoutubeAnnotations(mysample).auth_token = token
 >>> uploadview.update()
 >>> print uploadview.render()
     <div id="aws.youtube.upload">
