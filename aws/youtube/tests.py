@@ -1,8 +1,9 @@
 import unittest
+import doctest
 
 from zope.testing import doctestunit
 from zope.component import testing
-from Testing import ZopeTestCase as ztc
+#from Testing import ZopeTestCase as ztc
 
 def test_suite():
     return unittest.TestSuite([
@@ -10,7 +11,9 @@ def test_suite():
         # Unit tests for your API
         doctestunit.DocFileSuite(
             'README.txt', package='aws.youtube',
-            setUp=testing.setUp, tearDown=testing.tearDown),
+            setUp=testing.setUp, tearDown=testing.tearDown,
+            optionflags=doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE),
+
 
         #doctestunit.DocTestSuite(
         #    module='aws.youtube.mymodule',

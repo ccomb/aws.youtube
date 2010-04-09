@@ -1,0 +1,7 @@
+.*\.swp$
+.*\.pyc$
+bin/
+develop-eggs/
+.installed.cfg
+parts/
+aws.youtube.egg-info/
