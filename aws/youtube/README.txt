@@ -119,16 +119,32 @@ We can ask for a authentication link:
 
 >>> from zope.publisher.browser import TestRequest
 >>> IYoutube(mysample).get_auth_link(TestRequest())
+'https://www.google.com/accounts/AuthSubRequest?scope=http%3A%2F%2Fgdata.youtube.com&session=1&secure=0&hd=default&next=http%3A%2F%2F127.0.0.1%2Fsample%3Fauth_sub_scopes%3Dhttp%253A%252F%252Fgdata.youtube.com'
 
 Then we can authenticate with a single-use token provided by google:
 
->>> IYoutube(mysample).authenticate()
+>>> single_use_token = 'ABCDEFGHIJKL'
+
+>>> IYoutube(mysample).authenticate(TestRequest())
 
 This will store the token so that we can use it in later requests:
 
 >>> token = IYoutubeAnnotations(mysample).auth_token
 >>> token
-xXxXx
+''
+
+The URL was not correct, here is a good one, but this is not a real token so it
+fails:
+
+>>> IYoutube(mysample).authenticate(TestRequest(environ={'token': single_use_token, 'QUERY_STRING': 'token=%s' % single_use_token,}))
+Traceback (most recent call last):
+...
+NonAuthSubToken
+>>> token = IYoutubeAnnotations(mysample).auth_token
+>>> token
+''
+
+
 
 
 Upload content provider
