@@ -3,7 +3,6 @@ aws.youtube Package Readme
 We first setup zc.async to be able to do long upload or download tasks:
 
     >>> import transaction
-    >>> import BTrees
     >>> import ZODB.FileStorage, ZODB.blob
     >>> from ZODB.DB import DB
     >>> import tempfile
@@ -19,7 +18,8 @@ We first setup zc.async to be able to do long upload or download tasks:
     >>> db = DB(storage)
     >>> conn = db.open()
     >>> root = conn.root()
-    >>> PseudoZopeRoot = root['Application'] = BTrees.family32.OO.BTree()
+    >>> from zope.app.folder.folder import rootFolder
+    >>> PseudoZopeRoot = root['Application'] = rootFolder()
     >>> transaction.commit()
     >>> def _getRootObject():
     ...     return PseudoZopeRoot
@@ -50,11 +50,12 @@ Then we can create an arbitraty object and let it provide
 this interface. As an example, we use an interface similar to
 plone.app.blob.IATBlob:
 
->>> class Sample(object):
+>>> from zope.app.folder import Folder
+>>> from zope.location import Location
+>>> class Sample(Folder, Location):
 ...     title = 'some title'
 ...     blob = 'some data'
-...     __parent__ = None
-...     __name__ = 'the_sample'
+...     __name__ = 'sample'
 
 >>> from zope.interface import classImplements
 >>> classImplements(Sample, IYoutubeable)
@@ -63,11 +64,32 @@ We create an instance:
 
 >>> mysample = Sample()
 
+We store it in the root:
+
+>>> PseudoZopeRoot['sample'] = mysample
+
+We set an *annotatable* sitemanager on it (to be able to store config as
+annotation):
+
+>>> from zope.app.component.site import LocalSiteManager
+>>> from zope.annotation.interfaces import IAttributeAnnotatable
+>>> sm = LocalSiteManager(PseudoZopeRoot)
+>>> from zope.interface import alsoProvides
+>>> alsoProvides(sm, (IAttributeAnnotatable,))
+>>> PseudoZopeRoot.setSiteManager(sm)
+
+We register the SiteManagerAdapter (normally done with zcml from
+zope.app.component):
+
+>>> from zope.app.component.site import SiteManagerAdapter
+>>> from zope.component import getGlobalSiteManager
+>>> getGlobalSiteManager().registerAdapter(SiteManagerAdapter)
+
+
 Now we have a IYoutube adapter and an annotations adapter on this object:
 (we first register them)
 
 >>> from aws.youtube.adapters import youtubeannotations, Youtube
->>> from zope.component import getGlobalSiteManager
 >>> getGlobalSiteManager().registerAdapter(youtubeannotations)
 >>> getGlobalSiteManager().registerAdapter(Youtube)
 
@@ -86,12 +108,17 @@ The adapter is an annotation adapter that stores additional data:
 
 >>> IYoutubeAnnotations(mysample).foobar = 'baz'
 >>> print list(mysample.__annotations__.items())
-[('aws.youtube.adapters.YoutubeAnnotations', <aws.youtube.adapters.YoutubeAnnotations object at
-...>)]
+[('aws.youtube.adapters.YoutubeAnnotations', <aws.youtube.adapters.YoutubeAnnotations object at ...>)]
 
-We can ask for a authentication link
 
->>> IYoutube(mysample).get_auth_link()
+
+
+
+
+We can ask for a authentication link:
+
+>>> from zope.publisher.browser import TestRequest
+>>> IYoutube(mysample).get_auth_link(TestRequest())
 
 Then we can authenticate with a single-use token provided by google:
 

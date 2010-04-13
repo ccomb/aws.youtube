@@ -26,6 +26,9 @@ setup(name='aws.youtube',
           'zope.component',
           'zc.async',
           'zope.annotation',
+          'zope.app.component',
+          'zope.app.folder',
+          'gdata',
           # -*- Extra requirements: -*-
       ],
       entry_points="""
