@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope"
+           xmlns:meta="http://namespaces.zope.org/meta">
+
+
+<include package="zope.app.zcmlfiles" />
+<include package="z3c.form" file="meta.zcml" />
+<include package="z3c.form" />
+
+</configure>
+

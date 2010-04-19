@@ -28,6 +28,8 @@ setup(name='aws.youtube',
           'zope.annotation',
           'zope.app.component',
           'zope.app.folder',
+          'zope.contentprovider',
+          'z3c.form',
           'gdata',
           # -*- Extra requirements: -*-
       ],

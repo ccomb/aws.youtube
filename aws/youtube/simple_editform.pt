@@ -1,0 +1,22 @@
+    <i tal:condition="python:view.status" tal:content="python:view.status" />
+    <ul tal:condition="python:view.widgets.errors">
+      <li tal:repeat="error python:view.widgets.errors">
+        <tal:block condition="python:error.widget">
+          <tal:block replace="python:error.widget.label" />:
+        </tal:block>
+        <tal:block replace="structure python:error.render()" />
+      </li>
+    </ul>
+    <form action=".">
+      <div class="row" tal:repeat="widget python:view.widgets.values()">
+        <b tal:condition="python:widget.error"
+           tal:content="structure python:widget.error.render()"
+        /><label for=""
+               tal:attributes="for python:widget.id"
+               tal:content="python:widget.label" />
+        <input type="text" tal:replace="structure python:widget.render()"
+      /></div>
+      <div class="action" tal:repeat="action python:view.actions.values()">
+        <input type="submit" tal:replace="structure python:action.render()"
+      /></div>
+    </form>

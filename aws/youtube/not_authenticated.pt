@@ -1,0 +1,4 @@
+<div id="aws.youtube.upload">
+    <a href="" tal:attributes="href python:view.auth_link">Authenticate on Youtube!</a>
+</div>
+

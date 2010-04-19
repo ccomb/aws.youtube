@@ -1,0 +1,5 @@
+<div id="aws.youtube.upload">
+    <a href=""
+       tal:attributes="href python:view.youtube_link">This video is on Youtube!</a>
+    <a href="">Delete from youtube</a>
+</div>
